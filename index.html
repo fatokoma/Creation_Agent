@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GESTION DES PROJETS ET PROGRAMME DU MALI - Multi-Agents & RBM</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- CSS link -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- App Layout Container -->
+    <div class="app-container">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon">🇺🇳</div>
+                    <div class="logo-text">
+                        <span class="logo-title">G-PROJETS MALI</span>
+                        <span class="logo-subtitle">Projets & Programmes</span>
+                    </div>
+                </div>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-tab="dashboard">
+                    <span class="nav-icon">📊</span> Dashboard
+                </a>
+                <a href="#" class="nav-item" data-tab="logframe">
+                    <span class="nav-icon">🎯</span> Cadre Logique (ODD)
+                </a>
+                <a href="#" class="nav-item" data-tab="kanban">
+                    <span class="nav-icon">📋</span> Plan de Travail (AWP)
+                </a>
+                <a href="#" class="nav-item" data-tab="documents">
+                    <span class="nav-icon">📁</span> Centre de Documents
+                </a>
+                <a href="#" class="nav-item" data-tab="reports">
+                    <span class="nav-icon">📄</span> Rapports & PDF
+                </a>
+                <a href="#" class="nav-item" data-tab="chat">
+                    <span class="nav-icon">💬</span> Console d'Agents
+                </a>
+                <a href="#" class="nav-item" data-tab="database">
+                    <span class="nav-icon">💾</span> Base de Données
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="project-info-card">
+                    <div class="project-label">PROJET ACTIF</div>
+                    <div class="project-value" id="sidebar-project-code">PATEDD - 00123456</div>
+                    <div class="delivery-badge" id="sidebar-delivery-badge">Delivery: 46.7%</div>
+                </div>
+                <button class="reset-db-btn" onclick="UNDP_DB.resetDatabase(); location.reload();">
+                    🔄 Réinitialiser la DB
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            
+            <!-- Global Header -->
+            <header class="main-header">
+                <div class="header-left">
+                    <h1 id="page-title">Tableau de Bord du Projet</h1>
+                    <p class="project-title-text" id="project-fullname">Chargement du projet...</p>
+                </div>
+                <div class="header-right">
+                    <div class="header-stats">
+                        <div class="header-stat">
+                            <span class="stat-label">Budget Global</span>
+                            <span class="stat-val" id="header-budget">0 USD</span>
+                        </div>
+                        <div class="header-stat">
+                            <span class="stat-label">Taux d'Exécution (DR)</span>
+                            <span class="stat-val text-primary" id="header-delivery-rate">0%</span>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- TAB: Dashboard -->
+            <section id="tab-dashboard" class="tab-panel active">
+                <div class="grid-layout cols-4">
+                    <!-- Key KPI Cards -->
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper text-blue">💰</div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Dépenses Liquidées</span>
+                            <h3 class="kpi-value" id="kpi-spent">0 USD</h3>
+                            <span class="kpi-trend text-green" id="kpi-spent-rate">Taux d'avancement financier</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper text-rose">🎯</div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Cibles ODD Atteintes</span>
+                            <h3 class="kpi-value" id="kpi-targets">0 / 4</h3>
+                            <span class="kpi-trend text-blue" id="kpi-targets-avg">0% de réalisation moyen</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper text-cyan">📋</div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Activités Complétées</span>
+                            <h3 class="kpi-value" id="kpi-activities">0 / 5</h3>
+                            <span class="kpi-trend" id="kpi-activities-status">Q1-Q4 Plan de travail</span>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <div class="kpi-icon-wrapper text-emerald">📅</div>
+                        <div class="kpi-content">
+                            <span class="kpi-label">Prochains Jalons</span>
+                            <h3 class="kpi-value" id="kpi-calendar">0 Événement</h3>
+                            <span class="kpi-trend" id="kpi-calendar-next">Réunions et évaluations</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-layout cols-3 gap-25 mt-25">
+                    <!-- Column 1 & 2: Graphical representation -->
+                    <div class="span-2 card">
+                        <div class="card-header">
+                            <h4 class="card-title">Analyse Budgétaire par Produits du Projet</h4>
+                            <p class="card-subtitle">Comparaison Budget engagé vs Dépenses réelles (GAR)</p>
+                        </div>
+                        <div class="card-body">
+                            <!-- Visual Bars custom SVG container -->
+                            <div id="budget-chart-container" class="chart-container">
+                                <!-- Generated Dynamically in app.js -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Column 3: Active agents and indicators -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Statut de l'Équipe d'Agents</h4>
+                            <p class="card-subtitle">5 Agents de projet actifs</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="agents-status-list" id="agents-status-list">
+                                <!-- Generated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid-layout cols-2 gap-25 mt-25">
+                    <!-- Activity calendar and quick task additions -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Calendrier Opérationnel</h4>
+                            <p class="card-subtitle">Audits, comités et missions</p>
+                        </div>
+                        <div class="card-body">
+                            <ul class="calendar-list" id="dashboard-calendar-list">
+                                <!-- Generated dynamically -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Logs Feed -->
+                    <div class="card">
+                        <div class="card-header d-flex justify-between">
+                            <div>
+                                <h4 class="card-title">Flux d'Activité & Logs Systèmes</h4>
+                                <p class="card-subtitle">Modifications et appels de base de données en direct</p>
+                            </div>
+                            <span class="badge badge-system" id="log-count">0 logs</span>
+                        </div>
+                        <div class="card-body">
+                            <div class="log-feed-container" id="dashboard-log-feed">
+                                <!-- Live logs -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Cadre Logique (Logframe) -->
+            <section id="tab-logframe" class="tab-panel">
+                <div class="card">
+                    <div class="card-header d-flex justify-between align-center">
+                        <div>
+                            <h4 class="card-title">Cadre Logique & Indicateurs d'Impact</h4>
+                            <p class="card-subtitle">Mesure statistique des progrès par rapport à la situation de référence (GAR/ODD)</p>
+                        </div>
+                        <button class="btn btn-primary" onclick="app.showNewIndicatorModal()">+ Nouvel Indicateur</button>
+                    </div>
+                    <div class="card-body">
+                        <div class="indicators-grid" id="indicators-grid">
+                            <!-- Generated dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Kanban (AWP) -->
+            <section id="tab-kanban" class="tab-panel">
+                <div class="kanban-filter-bar card mb-20 d-flex justify-between align-center">
+                    <div class="filter-left d-flex align-center gap-15">
+                        <span class="filter-label">Filtrer par Trimestre :</span>
+                        <select id="kanban-quarter-filter" class="form-select">
+                            <option value="all">Tous les Trimestres</option>
+                            <option value="Q1">Premier Trimestre (Q1)</option>
+                            <option value="Q2">Deuxième Trimestre (Q2)</option>
+                            <option value="Q3">Troisième Trimestre (Q3)</option>
+                            <option value="Q4">Quatrième Trimestre (Q4)</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="app.showNewActivityModal()">+ Nouvelle Activité</button>
+                </div>
+
+                <div class="kanban-board">
+                    <!-- Column TO DO -->
+                    <div class="kanban-column" data-status="todo">
+                        <div class="kanban-column-header">
+                            <span class="column-title">À Faire (ToDo)</span>
+                            <span class="column-count" id="count-todo">0</span>
+                        </div>
+                        <div class="kanban-cards-container" id="cards-todo">
+                            <!-- Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Column IN PROGRESS -->
+                    <div class="kanban-column" data-status="in_progress">
+                        <div class="kanban-column-header">
+                            <span class="column-title">En Cours (In Progress)</span>
+                            <span class="column-count" id="count-in_progress">0</span>
+                        </div>
+                        <div class="kanban-cards-container" id="cards-in_progress">
+                            <!-- Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Column REVIEW -->
+                    <div class="kanban-column" data-status="review">
+                        <div class="kanban-column-header">
+                            <span class="column-title">En Revue (Review)</span>
+                            <span class="column-count" id="count-review">0</span>
+                        </div>
+                        <div class="kanban-cards-container" id="cards-review">
+                            <!-- Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Column DONE -->
+                    <div class="kanban-column" data-status="done">
+                        <div class="kanban-column-header">
+                            <span class="column-title">Terminé (Done)</span>
+                            <span class="column-count" id="count-done">0</span>
+                        </div>
+                        <div class="kanban-cards-container" id="cards-done">
+                            <!-- Cards -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Document Center -->
+            <section id="tab-documents" class="tab-panel">
+                <div class="grid-layout cols-2 gap-25">
+                    <!-- Document Drop Areas -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Dépôt des Termes de Référence (TDR)</h4>
+                            <p class="card-subtitle">Collez vos TDR pour planifier automatiquement une activité</p>
+                        </div>
+                        <div class="card-body d-flex flex-column gap-15">
+                            <textarea id="tdr-input-text" class="form-textarea" placeholder="Exemple : 
+TITRE : Organisation d'un atelier régional pour les coopératives agricoles durables.
+L'objectif est d'accompagner 10 coopératives du Nord sur les pratiques résilientes.
+Le budget prévisionnel est estimé à 15000 $ pour la logistique.
+Activité programmée pour le Q3 (troisième trimestre)."></textarea>
+                            <button class="btn btn-primary" onclick="app.processTDRSubmission()">⚙️ Analyser le TDR</button>
+                            
+                            <!-- Analysis Result Container -->
+                            <div id="tdr-result-container" class="document-result-box hidden">
+                                <h5>Résultats de l'Analyse (Agent Programme)</h5>
+                                <div class="tdr-fields mt-10">
+                                    <div class="tdr-field"><span class="label">Titre :</span> <span class="val" id="tdr-res-title">-</span></div>
+                                    <div class="tdr-field"><span class="label">Budget :</span> <span class="val text-primary" id="tdr-res-budget">-</span></div>
+                                    <div class="tdr-field"><span class="label">Période :</span> <span class="val" id="tdr-res-quarter">-</span></div>
+                                    <div class="tdr-field"><span class="label">Composante :</span> <span class="val" id="tdr-res-output">-</span></div>
+                                </div>
+                                <button class="btn btn-success mt-15 w-100" onclick="app.confirmTDRActivity()">✅ Valider et Insérer au Kanban</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Données de Terrain (Excel / CSV)</h4>
+                            <p class="card-subtitle">Déposez un fichier CSV pour mettre à jour les indicateurs</p>
+                        </div>
+                        <div class="card-body d-flex flex-column gap-15">
+                            <textarea id="csv-input-text" class="form-textarea" placeholder="Exemple :
+indicator_id, value, location, date
+ind_1, 35, Zone Commune A, 2026-07-21
+ind_1, 37, Zone Commune B, 2026-07-21
+ind_4, 38, Zone Nord Coop, 2026-07-21
+ind_4, 42, Zone Est Coop, 2026-07-21"></textarea>
+                            <button class="btn btn-secondary" onclick="app.processCSVSubmission()">📊 Traiter les Données de Terrain (M&E)</button>
+                            
+                            <!-- CSV Analysis Result -->
+                            <div id="csv-result-container" class="document-result-box hidden">
+                                <h5>Rapport de Collecte Statistique (Agent Suivi-Évaluation)</h5>
+                                <div class="csv-table-wrapper mt-10">
+                                    <table class="report-table-small">
+                                        <thead>
+                                            <tr>
+                                                <th>Code</th>
+                                                <th>Échantillon</th>
+                                                <th>Moyenne terrain</th>
+                                                <th>Écart-type</th>
+                                                <th>Progression</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="csv-res-tbody">
+                                            <!-- Dynamique -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Document Repository Table -->
+                <div class="card mt-25">
+                    <div class="card-header">
+                        <h4 class="card-title">Répertoire Documentaire du Projet</h4>
+                        <p class="card-subtitle">Historique des fichiers de référence et bases de données stockées</p>
+                    </div>
+                    <div class="card-body">
+                        <table class="report-table">
+                            <thead>
+                                <tr>
+                                    <th>Nom du Fichier</th>
+                                    <th>Date de Dépôt</th>
+                                    <th>Type</th>
+                                    <th>Taille</th>
+                                    <th>Déposé par</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="documents-table-body">
+                                <!-- Dynamique -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Generateur de TDR par Agent -->
+                <div class="card mt-25">
+                    <div class="card-header">
+                        <h4 class="card-title">Générateur de Termes de Référence (TDR) par Agent</h4>
+                        <p class="card-subtitle">Chaque membre de l'équipe peut établir un document TDR type relatif à ses missions pour validation et export PDF</p>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex gap-15 align-items-center flex-wrap" style="align-items: flex-end;">
+                            <div style="flex: 1; min-width: 250px;">
+                                <label for="tdr-agent-selector" style="display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 5px; color: var(--text-color);">Sélectionner l'Agent Émetteur :</label>
+                                <select id="tdr-agent-selector" class="form-control w-100" style="background: var(--bg-card); color: var(--text-color); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 6px; font-size: 0.9rem;">
+                                    <option value="PM">Chef de Projet (PM) - Organisation Comité de Pilotage</option>
+                                    <option value="ME">Agent Suivi-Évaluation (M&E) - Mission de Collecte de Données</option>
+                                    <option value="PROG">Agent Programme - Atelier de Renforcement Coopératives</option>
+                                    <option value="ACCT">Agent Comptable - Audit Interne & Conformité IPSAS</option>
+                                    <option value="FIN">Agent Financier - Table Ronde & Plaidoyer Bailleurs</option>
+                                    <option value="SPEC" id="tdr-spec-option">Spécialiste Sectoriel - Mission d'Expertise Technique (IA)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary" onclick="app.previewAgentTDR()">📄 Générer & Prévisualiser le TDR</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Reports (PDF Download) -->
+            <section id="tab-reports" class="tab-panel">
+                <div class="grid-layout cols-2 gap-25">
+                    <!-- Agent Reports Panel -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h4 class="card-title">Rapports d'Avancement des Agents</h4>
+                            <p class="card-subtitle">Générez et téléchargez le rapport d'expertise au format PDF</p>
+                        </div>
+                        <div class="card-body">
+                            <div class="agent-report-grid">
+                                <!-- Cards generated dynamically -->
+                                <div class="agent-report-card" data-agent="PM">
+                                    <div class="arc-header">
+                                        <span class="arc-avatar">👔</span>
+                                        <div>
+                                            <div class="arc-name">Chef de Projet (PM)</div>
+                                            <div class="arc-role">Recommandations stratégiques & GAR</div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm mt-10" onclick="app.previewAgentReport('PM')">📄 Prévisualiser / Exporter PDF</button>
+                                </div>
+
+                                <div class="agent-report-card" data-agent="ME">
+                                    <div class="arc-header">
+                                        <span class="arc-avatar">📊</span>
+                                        <div>
+                                            <div class="arc-name">Suivi-Évaluation (M&E)</div>
+                                            <div class="arc-role">Analyse statistique des indicateurs</div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm mt-10" onclick="app.previewAgentReport('ME')">📄 Prévisualiser / Exporter PDF</button>
+                                </div>
+
+                                <div class="agent-report-card" data-agent="PROG">
+                                    <div class="arc-header">
+                                        <span class="arc-avatar">📋</span>
+                                        <div>
+                                            <div class="arc-name">Agent Programme</div>
+                                            <div class="arc-role">Suivi du Plan de travail (AWP)</div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm mt-10" onclick="app.previewAgentReport('PROG')">📄 Prévisualiser / Exporter PDF</button>
+                                </div>
+
+                                <div class="agent-report-card" data-agent="ACCT">
+                                    <div class="arc-header">
+                                        <span class="arc-avatar">🧮</span>
+                                        <div>
+                                            <div class="arc-name">Agent Comptable</div>
+                                            <div class="arc-role">Grand livre général & transactions IPSAS</div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm mt-10" onclick="app.previewAgentReport('ACCT')">📄 Prévisualiser / Exporter PDF</button>
+                                </div>
+
+                                <div class="agent-report-card" data-agent="FIN">
+                                    <div class="arc-header">
+                                        <span class="arc-avatar">📈</span>
+                                        <div>
+                                            <div class="arc-name">Agent Financier</div>
+                                            <div class="arc-role">Delivery Rate & CDR Combines</div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm mt-10" onclick="app.previewAgentReport('FIN')">📄 Prévisualiser / Exporter PDF</button>
+                                </div>
+
+                                <div class="agent-report-card" data-agent="SPEC">
+                                    <div class="arc-header">
+                                        <span class="arc-avatar">🧬</span>
+                                        <div>
+                                            <div class="arc-name" id="report-spec-name">Spécialiste Sectoriel</div>
+                                            <div class="arc-role" id="report-spec-role">Analyse sectorielle TDR</div>
+                                        </div>
+                                    </div>
+                                    <button class="btn btn-outline-primary btn-sm mt-10" onclick="app.previewAgentReport('SPEC')">📄 Prévisualiser / Exporter PDF</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Final Decision Steering Committee Report -->
+                    <div class="card report-highlight-card">
+                        <div class="rh-header">
+                            <span class="rh-badge">VOTRE RAPPORT CLÉ</span>
+                            <h4 class="card-title text-white mt-10">Rapport Final de Décision Stratégique</h4>
+                            <p class="card-subtitle text-white-50">Document officiel d'aide à la décision préparé pour le Comité de Pilotage.</p>
+                        </div>
+                        <div class="card-body d-flex flex-column gap-15 justify-between" style="min-height: 250px;">
+                            <p class="text-white-80">Ce rapport consolidé croise les données financières (Taux de Livraison) et les indicateurs physiques de terrain (Moyennes statistiques d'impact). Il formule automatiquement un scénario de décision recommandé pour les autorités gouvernementales et le représentant du PNUD.</p>
+                            
+                            <div class="report-features-list">
+                                <div class="feature-item">✔ Consolidation Financière & RBM</div>
+                                <div class="feature-item">✔ Analyse statistique des écarts ODD</div>
+                                <div class="feature-item">✔ Scénarios décisionnels pré-configurés</div>
+                            </div>
+
+                            <button class="btn btn-light btn-lg w-100" onclick="app.previewFinalReport()">
+                                🚀 Générer le Rapport Décisionnel (PDF)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Agent Coordination Console (Chat) -->
+            <section id="tab-chat" class="tab-panel">
+                <div class="chat-layout card">
+                    <div class="chat-sidebar">
+                        <h5 class="chat-sidebar-title">Membres de l'Équipe</h5>
+                        <div class="chat-members-list" id="chat-members-list">
+                            <!-- Generated dynamically -->
+                        </div>
+                    </div>
+                    
+                    <div class="chat-area">
+                        <div class="chat-header">
+                            <div class="chat-header-info">
+                                <span class="active-indicator"></span>
+                                <div>
+                                    <div class="chat-title">Canal de Coordination de Projet</div>
+                                    <div class="chat-subtitle">Le Chef de Projet orchestre les contributions des agents spécialisés</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-danger btn-sm" onclick="app.clearChat()">Effacer</button>
+                        </div>
+                        
+                        <div class="chat-messages-container" id="chat-messages-container">
+                            <!-- Messages -->
+                        </div>
+
+                        <!-- Typing agent indicator -->
+                        <div id="agent-typing-indicator" class="agent-typing-card hidden">
+                            <span class="typing-avatar" id="typing-avatar">🤖</span>
+                            <div class="typing-bubble">
+                                <strong id="typing-name">Agent...</strong> réfléchit...
+                                <div class="typing-dots">
+                                    <span></span><span></span><span></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-suggestions-bar">
+                            <button class="suggestion-tag" onclick="app.sendSuggestedQuery('Faire le bilan budgétaire et financier du projet')">💰 Bilan Financier</button>
+                            <button class="suggestion-tag" onclick="app.sendSuggestedQuery('Analyser les indicateurs statistiques et progrès des ODD')">📈 Progrès des ODD</button>
+                            <button class="suggestion-tag" onclick="app.sendSuggestedQuery('Comment se comporte l\'indicateur de genre ODD 5 ?')">♀ Analyse Genre</button>
+                            <button class="suggestion-tag" onclick="app.sendSuggestedQuery('Lancer une réunion d\'alignement inter-agents')">👥 Réunion inter-agents</button>
+                        </div>
+
+                        <div class="chat-input-bar">
+                            <input type="text" id="chat-user-input" class="form-input" placeholder="Saisissez une requête ou donnez une instruction de coordination..." onkeydown="if(event.key === 'Enter') app.sendUserMessage()">
+                            <button class="btn btn-primary" onclick="app.sendUserMessage()">Envoyer</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: Database visualizer -->
+            <section id="tab-database" class="tab-panel">
+                <div class="card">
+                    <div class="card-header d-flex justify-between align-center">
+                        <div>
+                            <h4 class="card-title">Console d'Exploration de la Base de Données</h4>
+                            <p class="card-subtitle">Tables de données locales stockées en LocalStorage pour le suivi de projet</p>
+                        </div>
+                        <div class="d-flex gap-10">
+                            <button class="btn btn-outline-primary" onclick="app.exportDatabase()">📤 Exporter (JSON)</button>
+                            <button class="btn btn-outline-secondary" onclick="document.getElementById('import-db-file').click()">📥 Importer</button>
+                            <input type="file" id="import-db-file" class="hidden" onchange="app.importDatabase(event)">
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Table selector tabs -->
+                        <div class="table-tabs mb-20" id="db-table-tabs">
+                            <button class="table-tab active" data-table="activities">activities</button>
+                            <button class="table-tab" data-table="indicators">indicators</button>
+                            <button class="table-tab" data-table="financials">financials</button>
+                            <button class="table-tab" data-table="documents">documents</button>
+                            <button class="table-tab" data-table="calendar">calendar</button>
+                            <button class="table-tab" data-table="logs">logs</button>
+                        </div>
+
+                        <!-- Data table display -->
+                        <div class="database-table-wrapper">
+                            <table class="database-table" id="db-data-table">
+                                <thead>
+                                    <!-- Dynamic -->
+                                </thead>
+                                <tbody>
+                                    <!-- Dynamic -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MODAL: Preview Report -->
+    <div id="report-modal" class="modal-overlay hidden">
+        <div class="modal-content report-preview-modal">
+            <div class="modal-header print-hidden">
+                <h4 class="modal-title" id="modal-report-title">Prévisualisation du Rapport</h4>
+                <div class="d-flex gap-10">
+                    <button class="btn btn-success" onclick="window.print()">🖨️ Imprimer / Télécharger PDF</button>
+                    <button class="btn btn-outline-danger" onclick="app.closeReportModal()">Fermer</button>
+                </div>
+            </div>
+            <div class="modal-body report-print-container" id="modal-report-body">
+                <!-- Rapport rendu ici -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Add Activity -->
+    <div id="activity-modal" class="modal-overlay hidden">
+        <div class="modal-content form-modal">
+            <div class="modal-header">
+                <h4 class="modal-title">Créer une Nouvelle Activité</h4>
+                <button class="modal-close" onclick="app.closeActivityModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="activity-form" onsubmit="app.submitActivityForm(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="act-title">Titre de l'Activité</label>
+                        <input type="text" id="act-title" class="form-input" required placeholder="Ex: Construction d'un pôle de transformation...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="act-budget">Budget Alloué (USD)</label>
+                            <input type="number" id="act-budget" class="form-input" required min="1" placeholder="Ex: 25000">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="act-quarter">Trimestre</label>
+                            <select id="act-quarter" class="form-select">
+                                <option value="Q1">Q1</option>
+                                <option value="Q2">Q2</option>
+                                <option value="Q3">Q3</option>
+                                <option value="Q4">Q4</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="act-output">Produit Logique</label>
+                            <select id="act-output" class="form-select">
+                                <option value="Produit 1 : Énergie Propre">Produit 1 : Énergie Propre</option>
+                                <option value="Produit 2 : Inclusion Financière">Produit 2 : Inclusion Financière</option>
+                                <option value="Produit 3 : Suivi & Gouvernance">Produit 3 : Suivi & Gouvernance</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="act-assigned">Agent Responsable</label>
+                            <select id="act-assigned" class="form-select">
+                                <option value="Programme">Agent Programme</option>
+                                <option value="Finances">Agent Financier</option>
+                                <option value="Suivi-Evaluation">Agent Suivi-Évaluation</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-15">Enregistrer au Plan Annuel (AWP)</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Add Indicator -->
+    <div id="indicator-modal" class="modal-overlay hidden">
+        <div class="modal-content form-modal">
+            <div class="modal-header">
+                <h4 class="modal-title">Créer un Nouvel Indicateur</h4>
+                <button class="modal-close" onclick="app.closeIndicatorModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="indicator-form" onsubmit="app.submitIndicatorForm(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="ind-name">Intitulé de l'Indicateur</label>
+                        <input type="text" id="ind-name" class="form-input" required placeholder="Ex: Taux de pénétration des technologies vertes...">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="ind-baseline">Référence (Baseline)</label>
+                            <input type="number" id="ind-baseline" class="form-input" required placeholder="0">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ind-target">Cible (Target)</label>
+                            <input type="number" id="ind-target" class="form-input" required placeholder="100">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="ind-unit">Unité</label>
+                            <input type="text" id="ind-unit" class="form-input" required placeholder="Ex: %, personnes, kW">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label" for="ind-sdg">Objectif de Développement (ODD)</label>
+                            <select id="ind-sdg" class="form-select">
+                                <option value="ODD 7 - Énergie Propre">ODD 7 - Énergie Propre</option>
+                                <option value="ODD 8 - Travail Décent">ODD 8 - Travail Décent</option>
+                                <option value="ODD 1 - Pas de Pauvreté">ODD 1 - Pas de Pauvreté</option>
+                                <option value="ODD 5 - Égalité des Sexes">ODD 5 - Égalité des Sexes</option>
+                                <option value="ODD 13 - Climat">ODD 13 - Climat</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mt-15">Enregistrer l'Indicateur</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script references -->
+    <script src="db.js"></script>
+    <script src="agents.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
