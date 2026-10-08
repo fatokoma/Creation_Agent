@@ -282,7 +282,35 @@ L'objectif est d'accompagner 10 coopératives du Nord sur les pratiques résilie
 Le budget prévisionnel est estimé à 15000 $ pour la logistique.
 Activité programmée pour le Q3 (troisième trimestre)."></textarea>
                             <button class="btn btn-primary" onclick="app.processTDRSubmission()">⚙️ Analyser le TDR</button>
-                            
+                            <!-- BLOC D'IMPORTATION DE FICHIERS (PDF, WORD, EXCEL) -->
+                               
+                             <div class="bg-gray-800 p-6 rounded-lg shadow-md mb-6 border border-gray-700">
+                              <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                                📁 Importer un document (PDF, Word, Excel)
+                              </h3>
+                              <p class="text-gray-400 text-sm mb-4">
+                               Sélectionnez un fichier <strong>TDR / Prodoc (.pdf, .docx)</strong> pour analyse automatique Gemini, ou un fichier <strong>Excel / CSV (.xlsx, .csv)</strong> d'enquêtes M&E.
+                              </p>
+
+                              <div class="flex flex-col sm:flex-row gap-4 items-center">
+                                <input 
+                                 type="file" 
+                                id="documentFileInput" 
+                                 accept=".pdf, .docx, .doc, .txt, .xlsx, .xls, .csv" 
+                                 class="block w-full text-sm text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer bg-gray-900 border border-gray-700 rounded-md p-2"
+                                />
+                               <button 
+                                onclick="uploadDocumentFile()" 
+                                 class="w-full sm:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-md transition duration-200 flex items-center justify-center gap-2 whitespace-nowrap"
+                                  >
+                                 ⚡ Traiter le Fichier
+                                </button>
+                             </div>
+
+                            <!-- Zone de statut/chargement -->
+                             <div id="uploadStatus" class="mt-4 text-sm hidden"></div>
+                        </div>
+ 
                             <!-- Analysis Result Container -->
                             <div id="tdr-result-container" class="document-result-box hidden">
                                 <h5>Résultats de l'Analyse (Agent Programme)</h5>
